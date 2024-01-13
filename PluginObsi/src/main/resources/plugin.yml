@@ -1,0 +1,18 @@
+name: ObsidianBreaker
+main: com.creeperevents.oggehej.obsidianbreaker.obsidianbreaker.ObsidianBreaker
+version: 2.3.1
+description: Destroy obsidian like a baws
+author: oggehej
+softdepend: [Cannons]
+commands:
+  ObsidianBreaker:
+    description: ObsidianBreaker command
+    usage: /<command> [args]
+    aliases: ob
+permissions:
+  obsidianbreaker.test:
+    description: Allow user to test the durability of a block
+    default: true
+  obsidianbreaker.reload:
+    description: Allow user to reload the config
+    default: op
