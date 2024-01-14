@@ -79,5 +79,19 @@
             <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>net.minecraft.server.v1_12_R1</groupId>
+            <artifactId>minecraft</artifactId>
+            <version>1.12.2-R1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/craftbukkit-1.12.2.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.flansapi</groupId>
+            <artifactId>flansapi</artifactId>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/FlansAPI-v1.3.jar</systemPath>
+        </dependency>
     </dependencies>
 </project>

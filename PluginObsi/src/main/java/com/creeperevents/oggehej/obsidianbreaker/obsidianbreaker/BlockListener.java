@@ -6,21 +6,26 @@ import java.util.Random;
 
 import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import net.minecraft.server.v1_12_R1.EntityLiving;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /**
@@ -33,14 +38,54 @@ public class BlockListener implements Listener {
 	BlockListener(ObsidianBreaker instance) {
 		this.plugin = instance;
 	}
-
+	public static void printEntityInformation(Entity bukkitEntity) {
+		if (bukkitEntity instanceof CraftEntity) {
+			CraftEntity craftEntity = (CraftEntity) bukkitEntity;
+			net.minecraft.server.v1_12_R1.Entity nmsEntity = craftEntity.getHandle();
+			String entityTypeName = nmsEntity.getClass().getSimpleName();
+			String entityName = nmsEntity.getClass().getName();
+			String entityId = nmsEntity.getClass().getCanonicalName().toString();
+			double x = nmsEntity.locX;
+			double y = nmsEntity.locY;
+			double z = nmsEntity.locZ;
+			Bukkit.broadcastMessage("CanonicalName: " + entityId);
+			Bukkit.broadcastMessage("Entity Type: " + entityTypeName);
+			Bukkit.broadcastMessage("Entity Name: " + entityName);
+			Bukkit.broadcastMessage("Location: X=" + x + ", Y=" + y + ", Z=" + z);
+			if (nmsEntity instanceof EntityLiving) {
+				EntityLiving livingEntity = (EntityLiving) nmsEntity;
+				double health = livingEntity.getHealth();
+				Bukkit.broadcastMessage("Entity Health: " + health);
+			}
+		}
+	}
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onEntityExplode(EntityExplodeEvent event) {
-		Location explosionLocation = event.getLocation();
+		printEntityInformation(event.getEntity());
+		Entity entity = event.getEntity();
+		if (entity.getType() == EntityType.PRIMED_TNT && entity.hasMetadata("flansmod")) {
+			List<MetadataValue> metadata = entity.getMetadata("flansmod");
+			for (MetadataValue value : metadata) {
+				if (value.getOwningPlugin() instanceof ObsidianBreaker) {
+					String rocketName = value.asString();
+					System.out.println("Rocket Name: " + rocketName);
+				}
+			}
+		}
+		//Bukkit.broadcastMessage("1");
+		//if (entity.getType() == EntityType.PRIMED_TNT) {
+		//	Bukkit.broadcastMessage("2");
+		//	List<MetadataValue> metadata = entity.getMetadata("");
+		//	for (MetadataValue value : metadata) {
+		//		String rocketName = value.asString();
+		//		Bukkit.broadcastMessage(rocketName);
+		//	}
+		//}
+			Location explosionLocation = event.getLocation();
 		if (isInSpawnRegion(explosionLocation)) {
 			event.setCancelled(true);
-			String message = "Event cancelled.";
-			Bukkit.broadcastMessage(ChatColor.GREEN + message);
+			String message = "§8» §cWW2 §8« §fYou can't §cExplode §fthe spawn !";
+			Bukkit.broadcastMessage(message);
 		}
 			if(event.getEntity() == null)
 				return;
