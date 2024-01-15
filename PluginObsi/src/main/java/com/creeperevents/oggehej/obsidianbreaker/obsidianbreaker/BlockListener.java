@@ -38,13 +38,36 @@ public class BlockListener implements Listener {
 	BlockListener(ObsidianBreaker instance) {
 		this.plugin = instance;
 	}
+	@EventHandler
+	public void onEntityExplodee(EntityExplodeEvent event) {
+		for (Entity entity : event.getLocation().getWorld().getEntities()) {
+			if (entity.getLocation().distance(event.getLocation()) < 2.0) {
+				String entityName = entity.getType().name();
+
+				// Récupérer la taille de l'explosion
+				float explosionSize = event.getYield(); // Renvoie la taille de l'explosion en blocs (float)
+
+				// Récupérer le nom de l'entité ou de l'item
+				String entityOrItemName = entity.getType().name();
+
+				// Récupérer l'UUID de l'entité
+				String entityUUID = entity.getUniqueId().toString();
+
+				// Faire quelque chose avec toutes ces informations
+				// Par exemple, tu peux les diffuser à tous les joueurs pour que tout le monde les voie :
+				String message = "§aTaille explosion: " + explosionSize + ", §eEntité ou Item: " + entityOrItemName + ", §bUUID: " + entityUUID;
+				Bukkit.broadcastMessage(message);
+			}
+
+		}
+	}
 	public static void printEntityInformation(Entity bukkitEntity) {
 		if (bukkitEntity instanceof CraftEntity) {
 			CraftEntity craftEntity = (CraftEntity) bukkitEntity;
 			net.minecraft.server.v1_12_R1.Entity nmsEntity = craftEntity.getHandle();
 			String entityTypeName = nmsEntity.getClass().getSimpleName();
 			String entityName = nmsEntity.getClass().getName();
-			String entityId = nmsEntity.getClass().getCanonicalName().toString();
+			String entityId = nmsEntity.getClass().getCanonicalName();
 			double x = nmsEntity.locX;
 			double y = nmsEntity.locY;
 			double z = nmsEntity.locZ;
