@@ -12,6 +12,7 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import net.minecraft.server.v1_12_R1.EntityLiving;
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -49,14 +50,14 @@ public class BlockListener implements Listener {
 
 				// Récupérer le nom de l'entité ou de l'item
 				String entityOrItemName = entity.getType().name();
-
+				NBTTagCompound compound = new NBTTagCompound();
 				// Récupérer l'UUID de l'entité
 				String entityUUID = entity.getUniqueId().toString();
 
 				// Faire quelque chose avec toutes ces informations
 				// Par exemple, tu peux les diffuser à tous les joueurs pour que tout le monde les voie :
-				String message = "§aTaille explosion: " + explosionSize + ", §eEntité ou Item: " + entityOrItemName + ", §bUUID: " + entityUUID;
-				Bukkit.broadcastMessage(message);
+				//String message = "§aTaille explosion: " + explosionSize + ", §eEntité ou Item: " + entityOrItemName + ", §bUUID: " + entityUUID;
+				//Bukkit.broadcastMessage(message);
 			}
 
 		}
@@ -71,10 +72,10 @@ public class BlockListener implements Listener {
 			double x = nmsEntity.locX;
 			double y = nmsEntity.locY;
 			double z = nmsEntity.locZ;
-			Bukkit.broadcastMessage("CanonicalName: " + entityId);
-			Bukkit.broadcastMessage("Entity Type: " + entityTypeName);
-			Bukkit.broadcastMessage("Entity Name: " + entityName);
-			Bukkit.broadcastMessage("Location: X=" + x + ", Y=" + y + ", Z=" + z);
+			//Bukkit.broadcastMessage("CanonicalName: " + entityId);
+			//Bukkit.broadcastMessage("Entity Type: " + entityTypeName);
+			//Bukkit.broadcastMessage("Entity Name: " + entityName);
+			//Bukkit.broadcastMessage("Location: X=" + x + ", Y=" + y + ", Z=" + z);
 			if (nmsEntity instanceof EntityLiving) {
 				EntityLiving livingEntity = (EntityLiving) nmsEntity;
 				double health = livingEntity.getHealth();
@@ -82,12 +83,13 @@ public class BlockListener implements Listener {
 			}
 		}
 	}
+
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onEntityExplode(EntityExplodeEvent event) {
 		printEntityInformation(event.getEntity());
 		Entity entity = event.getEntity();
-		if (entity.getType() == EntityType.PRIMED_TNT && entity.hasMetadata("flansmod")) {
-			List<MetadataValue> metadata = entity.getMetadata("flansmod");
+		if (entity.getType() == EntityType.PRIMED_TNT && entity.hasMetadata("InfoType")) {
+			List<MetadataValue> metadata = entity.getMetadata("InfoType");
 			for (MetadataValue value : metadata) {
 				if (value.getOwningPlugin() instanceof ObsidianBreaker) {
 					String rocketName = value.asString();
@@ -95,15 +97,15 @@ public class BlockListener implements Listener {
 				}
 			}
 		}
-		//Bukkit.broadcastMessage("1");
-		//if (entity.getType() == EntityType.PRIMED_TNT) {
-		//	Bukkit.broadcastMessage("2");
-		//	List<MetadataValue> metadata = entity.getMetadata("");
-		//	for (MetadataValue value : metadata) {
-		//		String rocketName = value.asString();
-		//		Bukkit.broadcastMessage(rocketName);
-		//	}
-		//}
+		Bukkit.broadcastMessage("1");
+		if (entity.getType() == EntityType.PRIMED_TNT) {
+			Bukkit.broadcastMessage("2");
+			List<MetadataValue> metadata = entity.getMetadata("InfoType");
+			for (MetadataValue value : metadata) {
+				String rocketName = value.asString();
+				Bukkit.broadcastMessage(rocketName);
+			}
+		}
 			Location explosionLocation = event.getLocation();
 		if (isInSpawnRegion(explosionLocation)) {
 			event.setCancelled(true);
