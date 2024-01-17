@@ -41,8 +41,6 @@ public class ObsidianBreaker extends JavaPlugin {
 		playerListener = new PlayerListener(this);
 		storage = new StorageHandler(this);
 		worldGuard = (WorldGuardPlugin) getServer().getPluginManager().getPlugin("WorldGuard");
-		Bukkit.getMessenger().registerOutgoingPluginChannel(this, "typeww2");
-		Bukkit.getMessenger().registerIncomingPluginChannel(this, "typeww2", new PacketListener());
 
 		// Initialise NMS class
 		setupNMS();

@@ -29,6 +29,8 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import static com.creeperevents.oggehej.obsidianbreaker.obsidianbreaker.CSVReader.readAndRemoveDataFromCSV;
+
 /**
  * Block listener class
  * 
@@ -39,73 +41,11 @@ public class BlockListener implements Listener {
 	BlockListener(ObsidianBreaker instance) {
 		this.plugin = instance;
 	}
-	@EventHandler
-	public void onEntityExplodee(EntityExplodeEvent event) {
-		for (Entity entity : event.getLocation().getWorld().getEntities()) {
-			if (entity.getLocation().distance(event.getLocation()) < 2.0) {
-				String entityName = entity.getType().name();
-
-				// Récupérer la taille de l'explosion
-				float explosionSize = event.getYield(); // Renvoie la taille de l'explosion en blocs (float)
-
-				// Récupérer le nom de l'entité ou de l'item
-				String entityOrItemName = entity.getType().name();
-				NBTTagCompound compound = new NBTTagCompound();
-				// Récupérer l'UUID de l'entité
-				String entityUUID = entity.getUniqueId().toString();
-
-				// Faire quelque chose avec toutes ces informations
-				// Par exemple, tu peux les diffuser à tous les joueurs pour que tout le monde les voie :
-				//String message = "§aTaille explosion: " + explosionSize + ", §eEntité ou Item: " + entityOrItemName + ", §bUUID: " + entityUUID;
-				//Bukkit.broadcastMessage(message);
-			}
-
-		}
-	}
-	public static void printEntityInformation(Entity bukkitEntity) {
-		if (bukkitEntity instanceof CraftEntity) {
-			CraftEntity craftEntity = (CraftEntity) bukkitEntity;
-			net.minecraft.server.v1_12_R1.Entity nmsEntity = craftEntity.getHandle();
-			String entityTypeName = nmsEntity.getClass().getSimpleName();
-			String entityName = nmsEntity.getClass().getName();
-			String entityId = nmsEntity.getClass().getCanonicalName();
-			double x = nmsEntity.locX;
-			double y = nmsEntity.locY;
-			double z = nmsEntity.locZ;
-			//Bukkit.broadcastMessage("CanonicalName: " + entityId);
-			//Bukkit.broadcastMessage("Entity Type: " + entityTypeName);
-			//Bukkit.broadcastMessage("Entity Name: " + entityName);
-			//Bukkit.broadcastMessage("Location: X=" + x + ", Y=" + y + ", Z=" + z);
-			if (nmsEntity instanceof EntityLiving) {
-				EntityLiving livingEntity = (EntityLiving) nmsEntity;
-				double health = livingEntity.getHealth();
-				Bukkit.broadcastMessage("Entity Health: " + health);
-			}
-		}
-	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onEntityExplode(EntityExplodeEvent event) {
-		printEntityInformation(event.getEntity());
-		Entity entity = event.getEntity();
-		if (entity.getType() == EntityType.PRIMED_TNT && entity.hasMetadata("InfoType")) {
-			List<MetadataValue> metadata = entity.getMetadata("InfoType");
-			for (MetadataValue value : metadata) {
-				if (value.getOwningPlugin() instanceof ObsidianBreaker) {
-					String rocketName = value.asString();
-					System.out.println("Rocket Name: " + rocketName);
-				}
-			}
-		}
-		Bukkit.broadcastMessage("1");
-		if (entity.getType() == EntityType.PRIMED_TNT) {
-			Bukkit.broadcastMessage("2");
-			List<MetadataValue> metadata = entity.getMetadata("InfoType");
-			for (MetadataValue value : metadata) {
-				String rocketName = value.asString();
-				Bukkit.broadcastMessage(rocketName);
-			}
-		}
+
+
 			Location explosionLocation = event.getLocation();
 		if (isInSpawnRegion(explosionLocation)) {
 			event.setCancelled(true);
@@ -191,34 +131,52 @@ public class BlockListener implements Listener {
 		try {
 			float liquidDivider = (float) plugin.getConfig().getDouble("LiquidMultiplier");
 
-			if(isLiquid && liquidDivider <= 0)
+			if (isLiquid && liquidDivider <= 0)
 				return;
-
-			float rawDamage = explosive == null ? 1 : (float) plugin.getConfig().getDouble("ExplosionSources." + explosive.toString());
-			if(plugin.getStorage().addDamage(block, isLiquid ? rawDamage / liquidDivider : rawDamage)) {
-				plugin.getNMS().sendCrackEffect(block.getLocation(), -1);
-
-				@SuppressWarnings("unchecked")
-				List<String> list = (List<String>) plugin.getConfig().getList("Drops.DontDrop");
-				for(Object section : list) {
-					if(section instanceof Integer)
-						section = Integer.toString((Integer) section);
-
-					String[] s = ((String) section).split(":");
-					if(block.getTypeId() == Integer.parseInt(s[0]) && (s.length == 1 || block.getData() == Byte.parseByte(s[1]))) {
-						block.setType(Material.AIR);
-						return;
-					}
+			String data = null;
+			int loopCount = 0;
+			while (data == null && loopCount < 1) {
+				data = readAndRemoveDataFromCSV();
+				loopCount++;
+			}
+			String flans = null;
+			if (data != null) {
+				String[] parts = data.split(":");
+				if (parts.length >= 2) {
+					flans = parts[1];
+					flans = flans.substring(1);
 				}
-
-				if(new Random().nextInt(100) + 1 >= plugin.getConfig().getInt("Drops.DropChance"))
-					block.setType(Material.AIR);
-				else
-					block.breakNaturally();
-			} else
-				plugin.getStorage().renderCracks(block);
-		} catch(UnknownBlockTypeException e) {}
-	}
+			}
+				float rawDamage;
+				if (data == null) {
+					rawDamage = explosive == null ? 1 : (float) plugin.getConfig().getDouble("ExplosionSources." + explosive.toString());
+				} else {
+					rawDamage = flans == null ? 1 : (float) plugin.getConfig().getDouble("ExplosionSources." + flans);
+				}
+				if (plugin.getStorage().addDamage(block, isLiquid ? rawDamage / liquidDivider : rawDamage)) {
+					plugin.getNMS().sendCrackEffect(block.getLocation(), -1);
+					@SuppressWarnings("unchecked")
+					List<String> list = (List<String>) plugin.getConfig().getList("Drops.DontDrop");
+					for (Object section : list) {
+						if (section instanceof Integer)
+							section = Integer.toString((Integer) section);
+						String[] s = ((String) section).split(":");
+						if (block.getTypeId() == Integer.parseInt(s[0]) && (s.length == 1 || block.getData() == Byte.parseByte(s[1]))) {
+							block.setType(Material.AIR);
+							return;
+						}
+					}
+					if (new Random().nextInt(100) + 1 >= plugin.getConfig().getInt("Drops.DropChance"))
+						block.setType(Material.AIR);
+					else
+						block.breakNaturally();
+				} else {
+					plugin.getStorage().renderCracks(block);
+				}
+			} catch(UnknownBlockTypeException e){
+				e.printStackTrace();
+			}
+		}
 
 	/**
 	 * Class that will be called asynchronously
