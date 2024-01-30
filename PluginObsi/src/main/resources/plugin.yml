@@ -9,6 +9,9 @@ commands:
     description: ObsidianBreaker command
     usage: /<command> [args]
     aliases: ob
+  sell:
+    description: openwar command
+    usage: /<command> [args]
 permissions:
   obsidianbreaker.test:
     description: Allow user to test the durability of a block
