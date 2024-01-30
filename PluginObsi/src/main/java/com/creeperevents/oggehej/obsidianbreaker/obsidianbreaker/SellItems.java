@@ -82,6 +82,10 @@ public class SellItems implements CommandExecutor, Listener {
             if (itemStack != null && itemStack.getType() != Material.AIR && !isRenamedGlassPane(itemStack)) {
                price = getItemPrice(itemStack.getType()) * itemStack.getAmount();
                result += price;
+               if (price == 0) {
+                   player.getInventory().addItem(itemStack);
+                   player.sendMessage("§8«§bShop§8» §cYou can't sell that §f" + itemStack);
+               }
             }
         }
         economy.depositPlayer(player, result);
