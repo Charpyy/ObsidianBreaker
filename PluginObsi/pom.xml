@@ -93,6 +93,13 @@
             <systemPath>${project.basedir}/src/main/resources/craftbukkit-1.12.2.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>com.vault</groupId>
+            <artifactId>vault</artifactId>
+            <version>1.12.2-R1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/vault.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>com.flansapi</groupId>
             <artifactId>flansapi</artifactId>
             <version>1.12.2-R0.1-SNAPSHOT</version>
