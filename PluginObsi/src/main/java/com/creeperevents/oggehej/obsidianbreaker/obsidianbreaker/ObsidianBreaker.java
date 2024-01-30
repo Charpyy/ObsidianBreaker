@@ -8,12 +8,14 @@ import com.creeperevents.oggehej.obsidianbreaker.obsidianbreaker.nms.NMS;
 import com.creeperevents.oggehej.obsidianbreaker.obsidianbreaker.nms.Reflection;
 import com.creeperevents.oggehej.obsidianbreaker.obsidianbreaker.nms.ReflectionUtilsLight;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -36,11 +38,30 @@ public class ObsidianBreaker extends JavaPlugin {
 	private BukkitTask crackRunner;
 	BukkitTask regenRunner;
 	private Map<Material, Double> itemPrice = new HashMap<>();
+	private Economy economy;
 	/**
 	 * To be run on enable
 	 */
+	private boolean setupEconomy() {
+		if (getServer().getPluginManager().getPlugin("Vault") == null) {
+			return false;
+		}
+
+		RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+		if (rsp == null) {
+			return false;
+		}
+
+		economy = rsp.getProvider();
+		return economy != null;
+	}
 	public void onEnable() {
-		getCommand("sell").setExecutor(new SellItems(this));
+		if (!setupEconomy()) {
+			getLogger().severe("Vault ou un plugin d'économie compatible n'est pas installé !");
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
+		getCommand("sell").setExecutor(new SellItems(this, economy));
 		itemPrice.put(Material.DIAMOND_BLOCK, 540.0);
 		itemPrice.put(Material.AIR, 0.0);
 		itemPrice.put(Material.STONE, 0.4);

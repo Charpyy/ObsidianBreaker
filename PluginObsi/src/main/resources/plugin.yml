@@ -3,6 +3,7 @@ main: com.creeperevents.oggehej.obsidianbreaker.obsidianbreaker.ObsidianBreaker
 version: 2.3.1
 description: Destroy obsidian like a baws
 author: oggehej
+depend: [Vault]
 softdepend: [Cannons]
 commands:
   ObsidianBreaker:
