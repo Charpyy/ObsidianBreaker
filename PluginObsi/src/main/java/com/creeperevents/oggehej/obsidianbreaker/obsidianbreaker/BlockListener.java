@@ -21,6 +21,7 @@ import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -43,14 +44,14 @@ public class BlockListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onEntityExplode(EntityExplodeEvent event) {
+	public void onEntityExplode(Player player, EntityExplodeEvent event) {
 
 
 			Location explosionLocation = event.getLocation();
 		if (isInSpawnRegion(explosionLocation)) {
 			event.setCancelled(true);
 			String message = "§8» §cWW2 §8« §fYou can't §cExplode §fthe spawn !";
-			Bukkit.broadcastMessage(message);
+			player.sendMessage(message);
 		}
 			if(event.getEntity() == null)
 				return;
