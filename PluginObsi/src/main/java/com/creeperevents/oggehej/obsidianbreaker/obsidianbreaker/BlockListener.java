@@ -44,14 +44,12 @@ public class BlockListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onEntityExplode(Player player, EntityExplodeEvent event) {
+	public void onEntityExplode(EntityExplodeEvent event) {
 
 
 			Location explosionLocation = event.getLocation();
 		if (isInSpawnRegion(explosionLocation)) {
 			event.setCancelled(true);
-			String message = "§8» §cWW2 §8« §fYou can't §cExplode §fthe spawn !";
-			player.sendMessage(message);
 		}
 			if(event.getEntity() == null)
 				return;
