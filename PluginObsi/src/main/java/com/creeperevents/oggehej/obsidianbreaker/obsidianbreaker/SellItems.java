@@ -83,13 +83,16 @@ public class SellItems implements CommandExecutor, Listener {
                price = getItemPrice(itemStack.getType()) * itemStack.getAmount();
                result += price;
                if (price == 0) {
-                   player.getInventory().addItem(itemStack);
-                   player.sendMessage("§8«§bShop§8» §cYou can't sell that §f" + itemStack);
+                       player.getInventory().addItem(itemStack);
+                       String name = itemStack.getType().name();
+                       player.sendMessage("§8«§bShop§8» §cYou can't sell that §f" + name);
                }
             }
         }
         economy.depositPlayer(player, result);
-        player.sendMessage("§8«§bShop§8» §fYou sold all your items for §6" + result + "§6$.");
+        if (result != 0) {
+            player.sendMessage("§8«§bShop§8» §fYou sold all your items for §6" + result + "§6$.");
+        }
         result = 0;
         marketInventory.clear();
         player.closeInventory();
