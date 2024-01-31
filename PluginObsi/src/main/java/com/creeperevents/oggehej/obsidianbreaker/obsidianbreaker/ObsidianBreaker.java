@@ -68,6 +68,7 @@ public class ObsidianBreaker extends JavaPlugin {
 		itemPrice.put(Material.GRASS, 0.5);
 		itemPrice.put(Material.DIRT, 0.3);
 		itemPrice.put(Material.COBBLESTONE, 0.3);
+		itemPrice.put(Material.WOOL, 0.4);
 		itemPrice.put(Material.WOOD, 0.6);
 		itemPrice.put(Material.SAPLING, 0.2);
 		itemPrice.put(Material.BEDROCK, 100.0);
