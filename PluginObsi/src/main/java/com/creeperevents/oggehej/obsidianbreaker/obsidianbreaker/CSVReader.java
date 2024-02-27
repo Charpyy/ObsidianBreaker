@@ -7,7 +7,7 @@ import java.io.IOException;
 public class CSVReader {
 
     public static String readAndRemoveDataFromCSV() {
-        String csvFileName = "C:\\Users\\Chapy\\Desktop\\WW2 1.12.2 TEST\\csv\\test.csv";
+        String csvFileName = "E:\\WW2 SERVEUR LE VRAI\\csv\\explode.csv";
         String data = null;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFileName))) {
